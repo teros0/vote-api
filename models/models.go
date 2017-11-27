@@ -27,7 +27,7 @@ type (
 	}
 	Question struct {
 		Id          bson.ObjectId `bson:"_id,omitempty" json:"id"`
-		TaskId      bson.ObjectId `json:"taskid"`
+		TaskId      bson.ObjectId `json:"questionid"`
 		Description string        `json:"description"`
 		CreatedOn   time.Time     `json:"createdon,omitempty"`
 	}

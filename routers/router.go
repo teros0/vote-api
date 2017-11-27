@@ -8,6 +8,6 @@ func InitRouter() *mux.Router {
 	r := mux.NewRouter()
 	r = SetUserRoutes(r)
 	r = SetQuestionRoutes(r)
-	r = SetPoolRoutes()
+	r = SetPoolRoutes(r)
 	return r
 }
