@@ -34,6 +34,20 @@ type (
 	}
 	// For Get - /pools
 	PoolsResource struct {
-		Data []models.Task `json:"data"`
+		Data []models.Pool `json:"data"`
 	}	
+	// For Post/Put - /questions
+	QuestionResource struct {
+		Data QuestionModel `json:"data"`
+	}
+	// For Get - /questions
+	// For /pools/questions/id
+	QuestionsResource struct {
+		Data []models.Question `json:"data"`
+	}
+	//Model for a Question
+	QuestionModel struct {
+		PoolId      string `json:"poolid"`
+		Description string `json:"description"`
+}
 )
