@@ -27,7 +27,8 @@ func (u *user) Register(w http.ResponseWriter, r *http.Request) {
 	repo.CreateUser(user)
 	// Eliminating hash pass from response
 	user.HashPassword = nil
-	if j, err := json.Marshal(UserResource{Data: *user}); err != nil {
+	j, err := json.Marshal(UserResource{Data: *user})
+	if err != nil {
 		common.DisplayAppError(w, err, "An unexpected error has occured", 500)
 		return
 	}
@@ -44,16 +45,17 @@ func (u *user) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	loginModel := dataResource.Data
-	loginUser := models.User {
-		Email: loginModel.Email,
+	loginUser := models.User{
+		Email:    loginModel.Email,
 		Password: loginModel.Password,
 	}
 	context := NewContext()
 	defer context.Close()
 	c := context.DbCollection("users")
-	repo := &data.UserRepository{c}
+	repo := &data.UserRepository{C: c}
 
-	if user, err := repo.Login(loginUser); err != nil {
+	user, err := repo.Login(loginUser)
+	if err != nil {
 		common.DisplayAppError(w, err, "Invalid login credentials", 401)
 		return
 	}
@@ -66,7 +68,7 @@ func (u *user) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	user.HashPassword = nil
 	authUser := AuthUserModel{
-		User: user,
+		User:  user,
 		Token: token,
 	}
 	j, err := json.Marshal(AuthUserResource{Data: authUser})
@@ -77,4 +79,3 @@ func (u *user) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(j)
 }
-

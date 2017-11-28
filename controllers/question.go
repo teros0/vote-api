@@ -21,8 +21,8 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	questionModel := dataResource.Data
-	question := &models.TaskQuestion{
-		TaskId:      bson.ObjectIdHex(questionModel.TaskId),
+	question := &models.Question{
+		PoolId:      bson.ObjectIdHex(questionModel.PoolId),
 		Description: questionModel.Description,
 	}
 	context := NewContext()
@@ -40,14 +40,14 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 	w.Write(j)
 }
 
-func GetQuestionsByTask(w http.ResponseWriter, r *http.Request) {
+func GetQuestionsByPool(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	context := NewContext()
 	defer context.Close()
 	col := context.DbCollection("questions")
 	repo := &data.QuestionRepository{C: col}
-	questions := repo.GetByTask(id)
+	questions := repo.GetByPool(id)
 	j, err := json.Marshal(QuestionsResource{Data: questions})
 	if err != nil {
 		common.DisplayAppError(w, err, "An unexpected error has occurred", 500)
@@ -74,7 +74,7 @@ func GetQuestions(w http.ResponseWriter, r *http.Request) {
 	w.Write(j)
 }
 
-func GetQuestionByID(w http.ResponseWriter, r *http.Request) {
+func GetQuestionById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	context := NewContext()
@@ -111,7 +111,7 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	questionModel := dataResource.Data
-	question := &models.TaskQuestion{
+	question := &models.Question{
 		Id:          id,
 		Description: questionModel.Description,
 	}

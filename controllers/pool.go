@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
-	"github.com/gorilla/mux"
-	"gopkg.in/mgo.v2"
 	"pool/common"
 	"pool/data"
+
+	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -24,7 +24,8 @@ func CreatePool(w http.ResponseWriter, r *http.Request) {
 	c := context.DbCollection("pools")
 	repo := &data.PoolRepository{c}
 	repo.Create(pool)
-	if j, err := json.Marshal(PoolResource); err != nil {
+	j, err := json.Marshal(PoolResource{Data: *pool})
+	if err != nil {
 		common.DisplayAppError(w, err, "An unexpected error has occured", http.StatusInternalServerError)
 		return
 	}
@@ -55,7 +56,7 @@ func GetPoolById(w http.ResponseWriter, r *http.Request) {
 	defer context.Close()
 	c := context.DbCollection("pools")
 	repo := &data.PoolRepository{c}
-	task, err := repo.GetById(id)
+	pool, err := repo.GetById(id)
 	if err != nil {
 		if err == mgo.ErrNotFound {
 			common.DisplayAppError(w, err, "No resource found", http.StatusNoContent)
@@ -64,6 +65,12 @@ func GetPoolById(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	j, err := json.Marshal(PoolResource{Data: pool})
+	if err != nil {
+		common.DisplayAppError(w, err, "An unexpected error has occured", http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(j)
 }
 
 func GetPoolsByUser(w http.ResponseWriter, r *http.Request) {
@@ -72,18 +79,18 @@ func GetPoolsByUser(w http.ResponseWriter, r *http.Request) {
 	defer context.Close()
 	c := context.DbCollection("pools")
 	repo := &data.PoolRepository{c}
-	task := repo.GetByUser(id)
+	pools := repo.GetByUser(id)
 	j, err := json.Marshal(PoolsResource{Data: pools})
 	if err != nil {
 		common.DisplayAppError(w, err, "An unexpected error has occured", http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }
 
 func UpdatePool(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars()
+	vars := mux.Vars(r)
 	id := bson.ObjectIdHex(vars["id"])
 	var dataResource PoolResource
 	err := json.NewDecoder(r.Body).Decode(&dataResource)
@@ -96,15 +103,15 @@ func UpdatePool(w http.ResponseWriter, r *http.Request) {
 	context := NewContext()
 	defer context.Close()
 	c := context.DbCollection("pools")
-	repo := &data.PoolRepository{c}
+	repo := &data.PoolRepository{C: c}
 	if err := repo.Update(pool); err != nil {
-		common(w, err, "An unexpected error has occured", http.StatusInternalServerError)
+		common.DisplayAppError(w, err, "An unexpected error has occured", http.StatusInternalServerError)
 		return
 	}
 }
 
 func DeletePool(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars()["id"]
+	id := mux.Vars(r)["id"]
 	context := NewContext()
 	defer context.Close()
 	c := context.DbCollection("pools")
@@ -114,5 +121,3 @@ func DeletePool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-

@@ -10,15 +10,15 @@ import (
 
 func SetPoolRoutes(r *mux.Router) *mux.Router {
 	poolRouter := mux.NewRouter()
-	poolRouter.HandleFunc("/pools", controllers.Pool.Create).Methods("POST")
-	poolRouter.HandleFunc("/pools/{id}", controllers.Pool.Update).Methods("PUT")
-	poolRouter.HandleFunc("/pools", controllers.Pool.Get).Methods("Get")
-	poolRouter.HandleFunc("/pools/{id}", controllers.Pool.GetById).Methods("GET")
-	poolRouter.HandleFunc("/pools/users/{id}", controllers.Pool.GetByUser).Methods("GET")
-	poolRouter.HandleFunc("/pools/{id}", controllers.Pool.Delete).Methods("DELETE")
+	poolRouter.HandleFunc("/pools", controllers.CreatePool).Methods("POST")
+	poolRouter.HandleFunc("/pools/{id}", controllers.UpdatePool).Methods("PUT")
+	poolRouter.HandleFunc("/pools", controllers.GetPools).Methods("Get")
+	poolRouter.HandleFunc("/pools/{id}", controllers.GetPoolById).Methods("GET")
+	poolRouter.HandleFunc("/pools/users/{id}", controllers.GetPoolsByUser).Methods("GET")
+	poolRouter.HandleFunc("/pools/{id}", controllers.DeletePool).Methods("DELETE")
 	r.PathPrefix("/tasks").Handler(negroni.New(
 		negroni.HandlerFunc(common.Middleware.Authorize),
 		negroni.Wrap(poolRouter),
 	))
-	return router
+	return r
 }

@@ -11,7 +11,6 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
-	"github.com/gorilla/context"
 )
 
 // AppClaims provides custom claim for JWT
@@ -25,9 +24,9 @@ type AppClaims struct {
 // location of private/public key files
 const (
 	// openssl genrsa -out app.rsa 1024
-	privKeyPath = "keys/tm.rsa"
+	privKeyPath = "keys/app.rsa"
 	// openssl rsa -in app.rsa -pubout > app.rsa.pub
-	pubKeyPath = "keys/tm.rsa.pub"
+	pubKeyPath = "keys/app.rsa.pub"
 )
 
 // Private key for signing and public key for verification
@@ -127,8 +126,6 @@ func (m *middleware) Authorize(w http.ResponseWriter, r *http.Request, next http
 
 	}
 	if token.Valid {
-		// Set user name to HTTP context
-		context.Set(r, "user", token.Claims.(*AppClaims).UserName)
 		next(w, r)
 	} else {
 		DisplayAppError(

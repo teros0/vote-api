@@ -16,7 +16,7 @@ func main() {
 	n := negroni.Classic()
 	n.UseHandler(r)
 	s := &http.Server{
-		Addr:    config.ServerAddress,
+		Addr:    common.C.ServerAddress,
 		Handler: n,
 	}
 	s.ListenAndServe()
