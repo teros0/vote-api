@@ -27,4 +27,13 @@ type (
 		User models.User `json:"user"`
 		Token string `json:""token`
 	}
+	// For POST/PUT - /pools
+	// For GET - pools/id
+	PoolResource struct {
+		Data models.Pool `json:"data"`
+	}
+	// For Get - /pools
+	PoolsResource struct {
+		Data []models.Task `json:"data"`
+	}	
 )
